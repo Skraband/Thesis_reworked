@@ -39,4 +39,3 @@ class TransformerConfig:
         self.compressed_value_dim = None
         self.removed_freqs = None
         self.embedding_sizes = None
-        self.use_searched_srnn = False

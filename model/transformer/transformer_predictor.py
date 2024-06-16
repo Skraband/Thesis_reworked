@@ -220,10 +220,8 @@ class TransformerNet(Transformer):
     def forward(self, x: torch.Tensor, y=None, return_coefficients=False):
 
         if self.amt_prediction_samples is None:
-            #self.amt_prediction_samples = 144
-            #self.amt_prediction_windows = 4
-            self.amt_prediction_samples = y.shape[1]
-            self.amt_prediction_windows = self.stft(y).shape[-1]
+            self.amt_prediction_samples = 144
+            self.amt_prediction_windows = 4
 
         x_ = self.stft(x[:, :, -1]).swapaxes(-2, -1)
 

@@ -521,7 +521,7 @@ class MultivariateNormalArray(ExponentialFamilyArray):
         trace = (theta2.inverse() @ theta1.unsqueeze(dim=-1) @ theta1.unsqueeze(dim=-2))\
             .diagonal(dim1=-2, dim2=-1).sum(dim=-1)
         log_normalizer = trace / 4. - theta2.logdet() + self.num_dims * self.log_2pi / 2.
-        test = 0
+
         return log_normalizer
 
     def log_h(self, x):

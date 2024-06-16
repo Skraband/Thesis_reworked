@@ -9,8 +9,6 @@ class MinimalPreprocessor(PreprocessingOperator):
     earliest_datetime = datetime.datetime(2015, 1, 1, 0, 0, 0)
     earliest_date = datetime.date(2015, 1, 1)
 
-    earliest_date_exchange = datetime.datetime(1990,1,1,0,0)
-    earliest_date_solar = datetime.datetime(2006,1,1,0,0)
     def __init__(self, index_columns, target_column, group_by_attribute, emb_attributes, split_data=True,
                  prediction_timespan=14, context_timespan=90, timespan_step=1, min_group_size=400, retail=False,
                  remove_sundays=False):
@@ -34,7 +32,7 @@ class MinimalPreprocessor(PreprocessingOperator):
     def sequence_length(self):
         return self.context_timespan + self.prediction_timespan
 
-    def apply(self, data,data_source):
+    def apply(self, data):
         """
         Applies no normalization, but splits the given data_source into index, features and values
         """
@@ -72,16 +70,7 @@ class MinimalPreprocessor(PreprocessingOperator):
                         column_index += 1
 
             # Build features in correct order (index_0,..., index_n, group_by_attribute, features, target_column)
-            if type(d['column_values'][0]) == datetime.datetime and data_source.get_identifier() == 'ReadExchangePKL':
-                index_col = [(d['column_values'][i] - MinimalPreprocessor.earliest_date_exchange).days
-                             for i in self.index_columns]
-            elif type(d['column_values'][0]) == datetime.datetime and data_source.get_identifier() == 'ReadWikipediaPKL':
-                index_col = [(d['column_values'][i] - MinimalPreprocessor.earliest_date_exchange).days
-                             for i in self.index_columns]
-            elif type(d['column_values'][0]) == datetime.datetime and data_source.get_identifier() == 'ReadSolarPKL':
-                index_col = [(d['column_values'][i] - MinimalPreprocessor.earliest_date_solar).total_seconds()/60/60
-                             for i in self.index_columns]
-            elif type(d['column_values'][0]) == datetime.datetime:
+            if type(d['column_values'][0]) == datetime.datetime:
                 index_col = [(d['column_values'][i] - MinimalPreprocessor.earliest_datetime).total_seconds() / 60 / 15
                              for i in self.index_columns]
             elif type(d['column_values'][0]) == datetime.date:

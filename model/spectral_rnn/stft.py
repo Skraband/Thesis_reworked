@@ -48,7 +48,6 @@ class STFT(nn.Module):
                 zero_freqs = torch.zeros((x.shape[0], self.config.removed_freqs, x.shape[2])).to(device)
                 x = torch.cat([x, zero_freqs], dim=1)
 
-            #print(x.real.min())
             return torch.istft(x, n_fft=self.n_fft, hop_length=self.hop_length, win_length=self.win_size,
                                window=self.window, onesided=self.onesided, return_complex=False,
                                normalized=self.normalize_fft)

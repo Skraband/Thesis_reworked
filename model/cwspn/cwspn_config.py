@@ -7,7 +7,7 @@ class CWSPNConfig:
         # For WCSPN, both joint preparation & window_level can't be used
         self.prepare_joint = False
         self.window_level = False
-        self.use_searched_cwspn = False
+
         self.use_limited_context = use_limited_context
         self.rg_splits = rg_splits
         self.rg_split_size = rg_split_size

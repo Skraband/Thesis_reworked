@@ -9,24 +9,10 @@ from .model import Model
 import numpy as np
 import torch
 import torch.nn as nn
-#from darts.darts_cnn.model_search import Network as CWSPNModelSearch
-#from darts.darts_rnn.model_search import RNNModelSearch
+
 # Use GPU if avaiable
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-def load_arch_params(srnn=True):
-
-    if srnn:
-        arch_params_raw = np.array([[0.13259780406951904, 0.24076713621616364, 0.2534853518009186, 0.11249035596847534, 0.2606593370437622], [0.1440565586090088, 0.25148487091064453, 0.2283712923526764, 0.11011575162410736, 0.2659715712070465], [0.14229190349578857, 0.23250094056129456, 0.2703188359737396, 0.10851601511240005, 0.2463722676038742], [0.18138743937015533, 0.22439733147621155, 0.22608043253421783, 0.12540064752101898, 0.2427341789007187], [0.17366157472133636, 0.20776717364788055, 0.27516642212867737, 0.12462981045246124, 0.2187749594449997], [0.15872301161289215, 0.2027873545885086, 0.2700975239276886, 0.12379473447799683, 0.24459731578826904], [0.20973490178585052, 0.2041788399219513, 0.2237374484539032, 0.14984506368637085, 0.21250379085540771], [0.202859565615654, 0.1950104534626007, 0.2561758756637573, 0.14783424139022827, 0.1981198638677597], [0.18905547261238098, 0.19409416615962982, 0.2546370029449463, 0.1461944729089737, 0.2160188853740692], [0.18173353374004364, 0.17546316981315613, 0.2516404390335083, 0.14580832421779633, 0.2453545480966568], [0.20544281601905823, 0.20635414123535156, 0.21132592856884003, 0.16771581768989563, 0.20916123688220978], [0.2035631686449051, 0.20132912695407867, 0.2265666425228119, 0.16620858013629913, 0.2023324817419052], [0.19599156081676483, 0.2021075338125229, 0.22765564918518066, 0.16463622450828552, 0.2096090316772461], [0.18935491144657135, 0.18910448253154755, 0.23065787553787231, 0.16415654122829437, 0.2267262488603592], [0.1890873908996582, 0.1611195057630539, 0.24223291873931885, 0.16403093934059143, 0.24352917075157166], [0.20131433010101318, 0.20656262338161469, 0.2042701691389084, 0.18064041435718536, 0.20721252262592316], [0.1989413946866989, 0.20374609529972076, 0.21427693963050842, 0.1789049506187439, 0.20413054525852203], [0.19395166635513306, 0.2041616588830948, 0.21656383574008942, 0.17762456834316254, 0.2076983004808426], [0.19034822285175323, 0.19616955518722534, 0.21852216124534607, 0.17832164466381073, 0.21663837134838104], [0.1879197657108307, 0.1743212342262268, 0.23005910217761993, 0.17745517194271088, 0.2302446961402893], [0.1866140067577362, 0.15288281440734863, 0.24549749493598938, 0.16948345303535461, 0.24552226066589355], [0.20201094448566437, 0.20353685319423676, 0.20422334969043732, 0.18655401468276978, 0.20367483794689178], [0.20031118392944336, 0.20291019976139069, 0.20830510556697845, 0.1853429079055786, 0.20313063263893127], [0.19729267060756683, 0.20349645614624023, 0.2094917744398117, 0.18428833782672882, 0.2054307758808136], [0.19602423906326294, 0.19844990968704224, 0.21085995435714722, 0.18465517461299896, 0.21001076698303223], [0.1963476687669754, 0.18369664251804352, 0.21694990992546082, 0.1859038919210434, 0.21710191667079926], [0.19308514893054962, 0.16640199720859528, 0.2299496829509735, 0.18042123317718506, 0.23014190793037415], [0.18596242368221283, 0.1584322154521942, 0.24344603717327118, 0.16855596005916595, 0.24360328912734985], [0.20251137018203735, 0.2021455019712448, 0.20280678570270538, 0.1903916299343109, 0.20214466750621796], [0.2013077586889267, 0.2022128850221634, 0.20459626615047455, 0.18957774341106415, 0.2023053616285324], [0.19943907856941223, 0.2027737945318222, 0.20541439950466156, 0.18858157098293304, 0.20379118621349335], [0.19946148991584778, 0.19958913326263428, 0.2064257711172104, 0.1885538250207901, 0.20596981048583984], [0.20225463807582855, 0.1896560937166214, 0.20870020985603333, 0.19067268073558807, 0.20871639251708984], [0.20221146941184998, 0.17783591151237488, 0.21531134843826294, 0.18932873010635376, 0.21531252562999725], [0.19495221972465515, 0.17052757740020752, 0.22705817222595215, 0.18026337027549744, 0.22719866037368774], [0.19058695435523987, 0.17226488888263702, 0.2315262109041214, 0.1740020513534546, 0.23161986470222473]])
-        arch_params = (arch_params_raw == arch_params_raw.max(axis=1, keepdims=1)).astype(float)
-        arch_params_torch = torch.tensor(arch_params).cuda()
-
-    else:
-        arch_params_raw = np.array([[0.12599501013755798, 0.32322800159454346, 0.11491930484771729, 0.1612580418586731, 0.1243358924984932, 0.15026375651359558], [0.1389445960521698, 0.28792625665664673, 0.10612446069717407, 0.1558292806148529, 0.16506774723529816, 0.14610762894153595], [0.16202902793884277, 0.22440101206302643, 0.13319498300552368, 0.1553414911031723, 0.16785161197185516, 0.15718185901641846], [0.15680372714996338, 0.26380687952041626, 0.13456235826015472, 0.15701892971992493, 0.14242208003997803, 0.14538602530956268], [0.16321887075901031, 0.2002309411764145, 0.1338645964860916, 0.17844876646995544, 0.1609017252922058, 0.1633351445198059], [0.166190043091774, 0.2158687561750412, 0.13191263377666473, 0.17276370525360107, 0.155690535902977, 0.15757431089878082], [0.16268931329250336, 0.23585893213748932, 0.18545731902122498, 0.15871010720729828, 0.08522351086139679, 0.17206092178821564], [0.16955330967903137, 0.18751516938209534, 0.18044252693653107, 0.16271042823791504, 0.11133356392383575, 0.18844495713710785], [0.16884009540081024, 0.19716575741767883, 0.18785230815410614, 0.1649021953344345, 0.09780135750770569, 0.18343821167945862], [0.16892416775226593, 0.22190886735916138, 0.18126562237739563, 0.15215392410755157, 0.09399005025625229, 0.18175740540027618], [0.1666666716337204, 0.1666666716337204, 0.1666666716337204, 0.1666666716337204, 0.1666666716337204, 0.1666666716337204], [0.16666540503501892, 0.16666540503501892, 0.16667300462722778, 0.16666540503501892, 0.16666540503501892, 0.16666540503501892], [0.1666666716337204, 0.1666666716337204, 0.1666666716337204, 0.1666666716337204, 0.1666666716337204, 0.1666666716337204], [0.1666666716337204, 0.1666666716337204, 0.1666666716337204, 0.1666666716337204, 0.1666666716337204, 0.1666666716337204]])
-        arch_params = (arch_params_raw == arch_params_raw.max(axis=1, keepdims=1)).astype(float)
-        arch_params_torch = torch.tensor(arch_params).cuda()
-
-    return arch_params_torch
 
 class PWN(Model):
 
@@ -60,13 +46,14 @@ class PWN(Model):
         self.use_maf = use_maf
         self.smape_target = smape_target
 
-    def train(self, x_in, y_in, val_x, val_y, embedding_sizes, batch_size=256, epochs=70, lr=0.004, lr_decay=0.97):
+    def train(self, x_in, y_in, val_x, val_y, embedding_sizes, batch_size=256, epochs=70, lr=0.004, lr_decay=0.97, exp_id='0'):
 
         # TODO: Adjustment for complex optimization, needs documentation
+        if self.srnn.config.rnn_layer_config.use_cg_cell:
+            lr /= 4
+
         if type(self.srnn) == TransformerPredictor:
             lr /= 10
-        elif self.srnn.config.rnn_layer_config.use_cg_cell:
-            lr /= 4
 
         # Model is trained jointly on all groups
         x_ = np.concatenate(list(x_in.values()), axis=0)
@@ -83,40 +70,10 @@ class PWN(Model):
 
         self.westimator.stft_module = self.srnn.net.stft
 
-        if self.srnn.config.use_searched_srnn:
-            from darts.darts_rnn.model_search import RNNModelSearch
-            search_stft = self.srnn.net.stft
-            emsize = 300
-            nhid = 300
-            nhidlast = 300
-            ntokens = 10000
-            dropout = 0
-            dropouth = 0
-            dropouti = 0
-            dropoute = 0
-            dropoutx = 0
-            config_layer = self.srnn.config
-            srnn_search = RNNModelSearch(search_stft, config_layer, ntokens, emsize, nhid, nhidlast,
-                                     dropout, dropouth, dropoutx, dropouti, dropoute).cuda()
-            # set arch weights according to searched cell
-            arch_params = load_arch_params(True)
-            srnn_search.fix_arch_params(arch_params)
-            # set searched srnn arch as srnn net
-            self.srnn.net = srnn_search
         # Init westimator
         westimator_x_prototype, westimator_y_prototype = self.westimator.prepare_input(x[:1, :, -1], y[:1])
         self.westimator.input_sizes = westimator_x_prototype.shape[1], westimator_y_prototype.shape[1]
         self.westimator.create_net()
-
-        if self.westimator.config.use_searched_cwspn:
-            from darts.darts_cnn.model_search import Network as CWSPNModelSearch
-            in_seq_length = self.westimator.input_sizes[0] * (
-                2 if self.westimator.use_stft else 1)  # input sequence length into the WeightNN
-            output_length = self.westimator.num_sum_params + self.westimator.num_leaf_params  # combined length of sum and leaf params
-            sum_params = self.westimator.num_sum_params
-            cwspn_weight_nn_search = CWSPNModelSearch(in_seq_length, output_length, sum_params, layers=1, steps=4).cuda()
-            self.westimator.weight_nn = cwspn_weight_nn_search
-
 
         prediction_loss = lambda error: error.mean()
         ll_loss = lambda out: -1 * torch.logsumexp(out, dim=1).mean()
@@ -176,16 +133,9 @@ class PWN(Model):
                 all_f_cs = torch.from_numpy(all_f_cs).to(device)
 
         val_errors = []
-        val_smape_errors = []
         print(f'Starting Training of {self.identifier} model')
         for epoch in range(epochs):
             idx_batches = torch.randperm(x.shape[0], device=device).split(batch_size)
-
-            #if epoch % 2:
-            #    model_base_path = 'res/models/'
-            #    model_name = f'{self.identifier}-{str(epoch)}'
-            #    model_filepath = f'{model_base_path}{model_name}'
-            #    self.save(model_filepath)
 
             if self.train_rnn_w_ll:
                 ll_weight_history.append(current_ll_weight)
@@ -240,11 +190,7 @@ class PWN(Model):
                 westimator_optimizer.zero_grad()
 
                 if not self.srnn.config.use_cached_predictions:
-                    if self.srnn.config.use_searched_srnn:
-                        prediction, f_c = self.srnn.net(batch_x, batch_y, self.srnn.net.weights,
-                                                        return_coefficients=True)
-                    else:
-                        prediction, f_c = self.srnn.net(batch_x, batch_y, return_coefficients=True)
+                    prediction, f_c = self.srnn.net(batch_x, batch_y, return_coefficients=True)
                 else:
                     prediction, f_c = batch_p, batch_fc
 
@@ -254,12 +200,6 @@ class PWN(Model):
                 else:
                     prediction_ll, w_in = self.call_westimator(batch_westimator_x, prediction
                                         if self.train_rnn_w_ll and not self.always_detach else prediction.detach())
-
-                #if type(self.srnn) == TransformerPredictor:
-                #    num_to_cut = int(prediction_raw.shape[1]/3)
-                #    prediction = prediction_raw[:,num_to_cut:]
-                #else:
-                #    prediction = prediction_raw
 
                 error = p_base_loss(prediction, batch_y)
                 p_loss = prediction_loss(error)
@@ -374,19 +314,14 @@ class PWN(Model):
 
             westimator_losses_epoch.append(westimator_loss_epoch)
 
-            if True and epoch % 100 == 0:
+            if False and epoch % 3 == 0:
                 pred_val, _ = self.predict({key: x for key, x in val_x.items() if len(x) > 0}, mpe=False)
                 self.srnn.net.train()
                 self.westimator.spn.train()
                 self.westimator.weight_nn.train()
 
                 val_mse = np.mean([((p - val_y[key][:, :, -1]) ** 2).mean() for key, p in pred_val.items()])
-                val_smape = np.mean([2 * (np.abs(p - val_y[key][:, :, -1]) / (np.abs(p + 2) + np.abs(val_y[key][:, :, -1] + 2))).mean() for key, p in pred_val.items()])
-
                 val_errors.append(val_mse)
-                val_smape_errors.append(val_smape)
-                print('MSE Validation Error: '+str(val_mse))
-                print('SMAPE Validation Error: ' + str(val_smape))
 
         if not self.srnn.config.use_cached_predictions:
             predictions = []
@@ -397,12 +332,7 @@ class PWN(Model):
                 for i in range(x.shape[0] // batch_size + 1):
                     batch_x, batch_y = x[i * batch_size:(i + 1) * batch_size], \
                                        y[i * batch_size:(i + 1) * batch_size]
-                    if self.srnn.config.use_searched_srnn:
-                        prediction, f_c = self.srnn.net(batch_x, batch_y, self.srnn.net.weights,
-                                                        return_coefficients=True)
-                    else:
-                        prediction, f_c = self.srnn.net(batch_x, batch_y, return_coefficients=True)
-                    #prediction, f_c = self.srnn.net(batch_x, batch_y, return_coefficients=True)
+                    prediction, f_c = self.srnn.net(batch_x, batch_y, return_coefficients=True)
 
                     predictions.append(prediction)
                     f_cs.append(f_c)
@@ -428,19 +358,12 @@ class PWN(Model):
         ax2.plot(index, srnn_losses_p, label='SRNN-Loss Prediction', color='red')
         ax2.legend(loc='upper left')
 
-        plt.savefig('res/plots/0_PWN_Training_losses')
+        plt.savefig('res/plots/'+exp_id+'_Training_losses')
 
         plt.clf()
         plt.plot(val_errors)
-        plt.savefig('res/plots/0_PWN_Val_MSE')
-
-        plt.clf()
-        plt.plot(val_smape_errors)
-        plt.savefig('res/plots/0_PWN_Val_SMAPE')
-        np.savetxt('res/plots/0_PWN_Val_MSE.txt',val_errors)
-        np.savetxt('res/plots/0_PWN_Val_SMAPE.txt', val_smape_errors)
+        plt.savefig('res/plots/'+exp_id+'_Val_MSE')
         print(val_errors)
-        print(val_smape_errors)
 
         if self.train_rnn_w_ll:
             plt.clf()
@@ -451,7 +374,6 @@ class PWN(Model):
 
     @torch.no_grad()
     def predict(self, x, batch_size=1024, pred_label='', mpe=False):
-
         predictions, f_c = self.srnn.predict(x, batch_size, pred_label=pred_label, return_coefficients=True)
 
         x_ = {key: x_[:, :, -1] for key, x_ in x.items()}

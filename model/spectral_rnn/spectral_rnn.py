@@ -120,12 +120,7 @@ class SpectralRNN(Model):
 
                     for i in range(math.ceil(x_.shape[0] / batch_size)):
                         batch = torch.from_numpy(x_[i * batch_size:(i + 1) * batch_size])
-
-                        if self.config.use_searched_srnn:
-                            y_in = None
-                            out = self.net(batch.to(device).float(),y_in, self.net.weights, return_coefficients=return_coefficients)
-                        else:
-                            out = self.net(batch.to(device).float(), return_coefficients=return_coefficients)
+                        out = self.net(batch.to(device).float(), return_coefficients=return_coefficients)
 
                         if return_coefficients:
                             coefficients[key].append(out[1].detach().cpu())

@@ -1,4 +1,4 @@
-from data_source import BasicSelect, Mackey, ReadPowerPKL,ReadExchangePKL, ReadM4,ReadWikipediaPKL,ReadSolarPKL
+from data_source import BasicSelect, Mackey, ReadPowerPKL, ReadM4
 from .minimal_preprocessor import MinimalPreprocessor
 from util.dataset import split_dataset
 
@@ -25,7 +25,7 @@ class ZScoreNormalization(MinimalPreprocessor):
             and splits it into index, features and values
         """
 
-        features, targets, column_names, embedding_sizes = super().apply(data,data_source)
+        features, targets, column_names, embedding_sizes = super().apply(data)
 
         if self.single_group:
             last_sequence_labels = np.concatenate([[i == len(f) - 1 for i, x in enumerate(f)]
@@ -63,75 +63,29 @@ class ZScoreNormalization(MinimalPreprocessor):
                 train_x[key], train_y[key], test_x[key], test_y[key] = \
                     np.array(train_x[key]), np.array(train_y[key]), np.array(test_x[key]), np.array(test_y[key])
 
-        elif manual_split and isinstance(data_source, ReadExchangePKL):
-            train_x, train_y, test_x, test_y = {}, {}, {}, {}
-
-            for key in features.keys():
-                train_x[key], train_y[key], test_x[key], test_y[key] = [], [], [], []
-
-                for f, t in zip(features[key], targets[key]):
-
-                    if np.array_equal(features[key][-1],f):
-                        test_x[key].append(f)
-                        test_y[key].append(t)
-                    else:
-                        train_x[key].append(f)
-                        train_y[key].append(t)
-
-                train_x[key], train_y[key], test_x[key], test_y[key] = \
-                    np.array(train_x[key]), np.array(train_y[key]), np.array(test_x[key]), np.array(test_y[key])
-
-        elif manual_split and isinstance(data_source, ReadWikipediaPKL):
-            train_x, train_y, test_x, test_y = {}, {}, {}, {}
-
-            for key in features.keys():
-                train_x[key], train_y[key], test_x[key], test_y[key] = [], [], [], []
-
-                for f, t in zip(features[key], targets[key]):
-
-                    if np.array_equal(features[key][-1],f):
-                        test_x[key].append(f)
-                        test_y[key].append(t)
-                    else:
-                        train_x[key].append(f)
-                        train_y[key].append(t)
-
-                train_x[key], train_y[key], test_x[key], test_y[key] = \
-                    np.array(train_x[key]), np.array(train_y[key]), np.array(test_x[key]), np.array(test_y[key])
-
-        elif manual_split and isinstance(data_source, ReadSolarPKL):
-            train_x, train_y, test_x, test_y = {}, {}, {}, {}
-
-            for key in features.keys():
-                train_x[key], train_y[key], test_x[key], test_y[key] = [], [], [], []
-
-                for f, t in zip(features[key], targets[key]):
-
-                    if np.array_equal(features[key][-1],f):
-                        test_x[key].append(f)
-                        test_y[key].append(t)
-                    else:
-                        train_x[key].append(f)
-                        train_y[key].append(t)
-
-                train_x[key], train_y[key], test_x[key], test_y[key] = \
-                    np.array(train_x[key]), np.array(train_y[key]), np.array(test_x[key]), np.array(test_y[key])
-
         elif manual_split and isinstance(data_source, ReadM4):
             if last_sequence_labels is not None:
                 key = next(iter(features.keys()))
-                train_x = {key: np.array([f for i, f in enumerate(features[key])
+                train_x_a = {key: np.array([f for i, f in enumerate(features[key])
                                           if not last_sequence_labels[i]])}
-                train_y = {key: np.array([t for i, t in enumerate(targets[key])
+                train_y_a = {key: np.array([t for i, t in enumerate(targets[key])
                                           if not last_sequence_labels[i]])}
 
+                train_x, train_y, test_x_aux_a, test_y_aux_a = split_dataset(train_x_a, train_y_a, 0.99)
+                test_x_aux = {key: test_x_aux_a[key][-1:, :, :] for key in test_x_aux_a.keys()}
+                test_y_aux = {key: test_y_aux_a[key][-1:, :, :] for key in test_y_aux_a.keys()}
                 test_x = {key: np.array([f for i, f in enumerate(features[key])
                                          if last_sequence_labels[i]])}
                 test_y = {key: np.array([t for i, t in enumerate(targets[key])
                                          if last_sequence_labels[i]])}
             else:
-                train_x = {key: f[:-1] for key, f in features.items()}
-                train_y = {key: t[:-1] for key, t in targets.items()}
+                train_x_a = {key: f[:-1] for key, f in features.items()}
+                train_y_a = {key: t[:-1] for key, t in targets.items()}
+
+                train_x, train_y, test_x_aux_a, test_y_aux_a = split_dataset(train_x_a, train_y_a, 0.99)
+
+                test_x_aux = {key: test_x_aux_a[key][-1:,:,:] for key in test_x_aux_a.keys()}
+                test_y_aux = {key: test_y_aux_a[key][-1:,:,:] for key in test_y_aux_a.keys()}
 
                 test_x = {key: f[-1:] for key, f in features.items()}
                 test_y = {key: t[-1:] for key, t in targets.items()}
@@ -144,15 +98,14 @@ class ZScoreNormalization(MinimalPreprocessor):
             train_x, train_y, test_x, test_y = split_dataset(features, targets,
                                                              1. - (13 - 1) / len(next(iter(features.values()))))
         else:
-            train_x, train_y, test_x, test_y = split_dataset(features, targets, 0.8)
+            train_x_a, train_y_a, test_x, test_y = split_dataset(features, targets, 0.8)
+            #addtional split to test if test set causes weird behaviour
+            train_x, train_y, test_x_aux, test_y_aux = split_dataset(train_x_a, train_y_a, 0.8)
+
 
         # Perform normalization per group - normalization is only performed on target attribute!
         del_count = 0
         for key in features.keys():
-            if isinstance(data_source, ReadExchangePKL) or isinstance(data_source, ReadWikipediaPKL) or isinstance(data_source, ReadSolarPKL):
-                self.mean[key] = 0
-                self.std[key] = 1
-                continue
             try:
                 combined_values = np.concatenate([train_x[key][..., -1], train_y[key][..., -1]], axis=-1)
             except:
@@ -164,9 +117,8 @@ class ZScoreNormalization(MinimalPreprocessor):
             train_y[key][:, :, -1] -= self.mean[key]
 
             self.std[key] = combined_values.std()
-            if self.std[key] == 0:
-                self.std[key] = 1
-
+            #if self.std[key] == 0:
+            #    self.std[key] = 1
             train_x[key][:, :, -1] /= self.std[key]
             train_y[key][:, :, -1] /= self.std[key]
 
@@ -175,12 +127,17 @@ class ZScoreNormalization(MinimalPreprocessor):
                 test_y[key][:, :, -1] -= self.mean[key]
                 test_x[key][:, :, -1] /= self.std[key]
                 test_y[key][:, :, -1] /= self.std[key]
+
+                test_x_aux[key][:, :, -1] -= self.mean[key]
+                test_y_aux[key][:, :, -1] -= self.mean[key]
+                test_x_aux[key][:, :, -1] /= self.std[key]
+                test_y_aux[key][:, :, -1] /= self.std[key]
             except IndexError:
                 pass
 
         print(f'Deleted {del_count} groups, {len(features.values())} groups left')
 
-        return train_x, train_y, test_x, test_y, column_names, embedding_sizes, last_sequence_labels
+        return train_x, train_y,test_x_aux,test_y_aux, test_x, test_y, column_names, embedding_sizes, last_sequence_labels
 
     def reverse(self, values):
         """

@@ -18,9 +18,9 @@ class SpectralRNNConfig:
                  embedding_dim=32, hidden_dim=64, clip_gradient_value=1, use_add_linear=False, x_as_labels=False,
                  use_only_ts_input=True, rnn_layer_config: RNNLayerConfig = RNNLayerConfig(),
                  use_cached_predictions=False):
-
         # Set fft_compression to 1 for no compression at all
         # Set clip_gradient_value to <= 0 to deactivate
+
         self.window_size = window_size
         self.overlap = overlap
         self.fft_compression = fft_compression
@@ -40,5 +40,3 @@ class SpectralRNNConfig:
         self.compressed_value_dim = None
         self.removed_freqs = None
         self.embedding_sizes = None
-
-        self.use_searched_srnn = False

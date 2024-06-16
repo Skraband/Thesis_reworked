@@ -9,25 +9,10 @@ from .model import Model
 import numpy as np
 import torch
 import torch.nn as nn
-#from darts.darts_cnn.model_search import Network as CWSPNModelSearch
-#from darts.darts_rnn.model_search import RNNModelSearch
 
 # Use GPU if avaiable
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-def load_arch_params(srnn=True):
-
-    if srnn:
-        arch_params_raw = np.array([[0.12425484508275986, 0.13287867605686188, 0.3053589165210724, 0.12407691776752472, 0.31343069672584534], [0.1471414864063263, 0.1716749519109726, 0.2689335346221924, 0.15429958701133728, 0.25795045495033264], [0.12622499465942383, 0.14418970048427582, 0.3033452332019806, 0.12716391682624817, 0.2990761697292328], [0.15721747279167175, 0.18280093371868134, 0.23875008523464203, 0.1699821650981903, 0.25124937295913696], [0.13004758954048157, 0.1471775621175766, 0.2947767972946167, 0.13212530314922333, 0.2958727777004242], [0.13210837543010712, 0.14104391634464264, 0.28938964009284973, 0.1323057860136032, 0.3051522374153137], [0.17168262600898743, 0.19226105511188507, 0.2182369828224182, 0.1866532266139984, 0.2311660647392273], [0.13781553506851196, 0.15585428476333618, 0.27699413895606995, 0.14252912998199463, 0.28680694103240967], [0.1359567940235138, 0.14785297214984894, 0.2819565534591675, 0.13781803846359253, 0.29641565680503845], [0.1345694661140442, 0.1378871351480484, 0.28920304775238037, 0.13495169579982758, 0.30338871479034424], [0.18426808714866638, 0.19968274235725403, 0.20449098944664001, 0.19579121470451355, 0.2157669961452484], [0.14991770684719086, 0.16388356685638428, 0.25402095913887024, 0.157046839594841, 0.2751309275627136], [0.14341603219509125, 0.1550014764070511, 0.2648983299732208, 0.1470896452665329, 0.28959453105926514], [0.13954532146453857, 0.14323531091213226, 0.27765604853630066, 0.1403735876083374, 0.2991897165775299], [0.1372540295124054, 0.13370491564273834, 0.2900788486003876, 0.13680413365364075, 0.30215808749198914], [0.19367198646068573, 0.2013566941022873, 0.20089995861053467, 0.19881699979305267, 0.20525440573692322], [0.16387887299060822, 0.17883221805095673, 0.23284240067005157, 0.1715090423822403, 0.2529374361038208], [0.15318745374679565, 0.16522406041622162, 0.2501991391181946, 0.15793684124946594, 0.2734524607658386], [0.14591865241527557, 0.1509062647819519, 0.2667388916015625, 0.14764773845672607, 0.28878843784332275], [0.1419358104467392, 0.13989904522895813, 0.28172406554222107, 0.14170022308826447, 0.29474085569381714], [0.13864924013614655, 0.13600076735019684, 0.28776228427886963, 0.13783687353134155, 0.2997508645057678], [0.1973322480916977, 0.20142269134521484, 0.20004023611545563, 0.19924011826515198, 0.20196473598480225], [0.1765821874141693, 0.18998417258262634, 0.2179604172706604, 0.18260882794857025, 0.2328644096851349], [0.16478556394577026, 0.17697773873806, 0.23308713734149933, 0.1698693037033081, 0.2552802562713623], [0.15487118065357208, 0.16157126426696777, 0.25039204955101013, 0.1575969159603119, 0.2755686640739441], [0.1478762924671173, 0.14858323335647583, 0.2695561647415161, 0.14874333143234253, 0.2852410078048706], [0.14325501024723053, 0.1419588327407837, 0.2781819999217987, 0.143024742603302, 0.29357942938804626], [0.13893824815750122, 0.13765373826026917, 0.28746873140335083, 0.13878203928470612, 0.2971571683883667], [0.19894593954086304, 0.20094114542007446, 0.1999133676290512, 0.1992943435907364, 0.20090517401695251], [0.18553516268730164, 0.19513802230358124, 0.21019703149795532, 0.18911023437976837, 0.22001954913139343], [0.17598596215248108, 0.18599717319011688, 0.21931026875972748, 0.17988651990890503, 0.23882010579109192], [0.1651717722415924, 0.1725427210330963, 0.23293372988700867, 0.16802926361560822, 0.2613224685192108], [0.15594720840454102, 0.15925058722496033, 0.25276708602905273, 0.1573585569858551, 0.2746766209602356], [0.14931944012641907, 0.14970822632312775, 0.2654818296432495, 0.1493559330701828, 0.2861345708370209], [0.14388667047023773, 0.1431637704372406, 0.27797552943229675, 0.14345373213291168, 0.29152026772499084], [0.13940495252609253, 0.13847973942756653, 0.28648674488067627, 0.13872390985488892, 0.29690462350845337]])
-        arch_params = (arch_params_raw == arch_params_raw.max(axis=1, keepdims=1)).astype(float)
-        arch_params_torch = torch.tensor(arch_params).cuda()
-
-    else:
-        arch_params_raw = 0
-        arch_params = (arch_params_raw == arch_params_raw.max(axis=1, keepdims=1)).astype(float)
-        arch_params_torch = torch.tensor(arch_params).cuda()
-
-    return arch_params_torch
 
 class PWNEM(Model):
 
@@ -44,7 +29,6 @@ class PWNEM(Model):
             TransformerConfig(normalize_fft=True, window_size=s_config.window_size,
                               fft_compression=s_config.fft_compression))
         self.westimator = WEin(c_config)
-
 
         self.train_spn_on_gt = train_spn_on_gt
         self.train_spn_on_prediction = train_spn_on_prediction
@@ -64,10 +48,11 @@ class PWNEM(Model):
     def train(self, x_in, y_in, val_x, val_y, embedding_sizes, batch_size=256, epochs=100, lr=0.004, lr_decay=0.97):
 
         # TODO: Adjustment for complex optimization, needs documentation
+        if False and self.srnn.config.rnn_layer_config.use_cg_cell:
+            lr /= 4
+
         if type(self.srnn) == TransformerPredictor:
             lr /= 10
-        elif False and self.srnn.config.rnn_layer_config.use_cg_cell:
-            lr /= 4
 
         # Model is trained jointly on all groups
         x_ = np.concatenate(list(x_in.values()), axis=0)
@@ -83,27 +68,6 @@ class PWNEM(Model):
         self.srnn.build_net()
 
         self.westimator.stft_module = self.srnn.net.stft
-
-        if self.srnn.config.use_searched_srnn:
-            search_stft = self.srnn.net.stft
-            emsize = 300
-            nhid = 300
-            nhidlast = 300
-            ntokens = 10000
-            dropout = 0
-            dropouth = 0
-            dropouti = 0
-            dropoute = 0
-            dropoutx = 0
-            config_layer = self.srnn.config
-            srnn_search = RNNModelSearch(search_stft, config_layer, ntokens, emsize, nhid, nhidlast,
-                                     dropout, dropouth, dropoutx, dropouti, dropoute).cuda()
-            # set arch weights according to searched cell
-            arch_params = load_arch_params(True)
-            srnn_search.fix_arch_params(arch_params)
-            # set searched srnn arch as srnn net
-            self.srnn.net = srnn_search
-
 
         # Init westimator
         westimator_x_prototype, westimator_y_prototype = self.westimator.prepare_input(x[:1, :, -1], y[:1])
@@ -164,12 +128,6 @@ class PWNEM(Model):
         for epoch in range(epochs):
             idx_batches = torch.randperm(x.shape[0], device=device).split(batch_size)
 
-            #if epoch % 2:
-            #    model_base_path = 'res/models/'
-            #    model_name = f'{self.identifier}-{str(epoch)}'
-            #    model_filepath = f'{model_base_path}{model_name}'
-            #    self.save(model_filepath)
-
             if self.train_rnn_w_ll:
                 ll_weight_history.append(current_ll_weight)
 
@@ -204,12 +162,9 @@ class PWNEM(Model):
                 srnn_optimizer.zero_grad()
 
                 if not self.srnn.config.use_cached_predictions:
-                    if self.srnn.config.use_searched_srnn:
-                        prediction_raw, f_c = self.srnn.net(batch_x, batch_y,self.srnn.net.weights, return_coefficients=True)
-                    else:
-                        prediction_raw, f_c = self.srnn.net(batch_x, batch_y, return_coefficients=True)
+                    prediction, f_c = self.srnn.net(batch_x, batch_y, return_coefficients=True)
                 else:
-                    prediction_raw, f_c = batch_p, batch_fc
+                    prediction, f_c = batch_p, batch_fc
 
                 if self.westimator.use_stft:
                     prediction_ll_ = self.call_westimator(batch_westimator_x,
@@ -227,18 +182,6 @@ class PWNEM(Model):
                     prediction_ll, _, prediction_ll_cond, w_win = prediction_ll_
                 else:
                     prediction_ll, _ = prediction_ll_
-
-                if self.westimator.use_stft:
-                    prediction_ll, w_in = self.call_westimator(batch_westimator_x, f_c.reshape((f_c.shape[0], -1))
-                                        if self.train_rnn_w_ll and not self.always_detach else f_c.reshape((f_c.shape[0], -1)).detach())
-                else:
-                    prediction_ll, w_in = self.call_westimator(batch_westimator_x, prediction
-                                        if self.train_rnn_w_ll and not self.always_detach else prediction.detach())
-
-                if type(self.srnn) == TransformerPredictor:
-                    prediction = prediction_raw
-                else:
-                    prediction = prediction_raw
 
                 error = p_base_loss(prediction, batch_y)
                 p_loss = prediction_loss(error)
@@ -287,10 +230,10 @@ class PWNEM(Model):
                 srnn_loss_ll_e += l_loss
                 srnn_loss_e += srnn_loss.detach()
 
-                westimator_losses.append(westimator_loss.detach().cpu().numpy())#westimator_losses.append(westimator_loss.detach())
-                srnn_losses.append(srnn_loss.detach().cpu().numpy())#srnn_losses.append(srnn_loss.detach())
-                srnn_losses_p.append(p_loss.detach().cpu().numpy())#srnn_losses_p.append(p_loss.detach())
-                srnn_losses_ll.append(l_loss)#srnn_losses_ll.append(l_loss)
+                westimator_losses.append(westimator_loss.detach())
+                srnn_losses.append(srnn_loss.detach())
+                srnn_losses_p.append(p_loss.detach())
+                srnn_losses_ll.append(l_loss)
 
                 if (i + 1) % 10 == 0:
                     print(f'Epoch {epoch + 1} / {epochs}: Step {(i + 1)} / {len(idx_batches)}. '
@@ -333,7 +276,7 @@ class PWNEM(Model):
 
             westimator_losses_epoch.append(westimator_loss_epoch)
 
-            if False and epoch % 10 == 0:
+            if False and epoch % 3 == 0:
                 pred_val, _ = self.predict({key: x for key, x in val_x.items() if len(x) > 0}, mpe=False)
                 self.srnn.net.train()
                 self.westimator.net.train()
